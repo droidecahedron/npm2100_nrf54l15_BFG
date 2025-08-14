@@ -1,17 +1,19 @@
 #ifndef BLE_PERIPH_PMIC_H_
 #define BLE_PERIPH_PMIC_H_
 
-#include <zephyr/types.h>
-#include <stddef.h>
-#include <string.h>
-#include <errno.h>
-#include <zephyr/kernel.h>
-#include <soc.h>
 
 #include <zephyr/bluetooth/bluetooth.h>
-#include <zephyr/bluetooth/hci.h>
-#include <zephyr/bluetooth/conn.h>
-#include <zephyr/bluetooth/uuid.h>
-#include <zephyr/bluetooth/gatt.h>
+
+// Declaration of custom GATT service and characteristics UUIDs
+#define PMIC_HUB_SERVICE_UUID BT_UUID_128_ENCODE(0x2100F600, 0x8445, 0x5fca, 0xb332, 0xc13064b9dea2)
+#define BOOST_RD_MV_CHARACTERISTIC_UUID BT_UUID_128_ENCODE(0xB0057000, 0x7ea8, 0x4008, 0xb432, 0xb46096c049ba)
+#define BOOST_WR_MV_CHARACTERISTIC_UUID BT_UUID_128_ENCODE(0xB0057111, 0x7ea8, 0x4008, 0xb432, 0xb46096c049ba)
+#define LSLDO_RD_MV_CHARACTERISTIC_UUID BT_UUID_128_ENCODE(0x757D0000, 0xd8ee, 0x4faf, 0x956b, 0xafb01c17d0be)
+#define LSLDO_WR_MV_CHARACTERISTIC_UUID BT_UUID_128_ENCODE(0x757D0111, 0xd8ee, 0x4faf, 0x956b, 0xafb01c17d0be)
+#define BATT_RD_CHARACTERISTIC_UUID BT_UUID_128_ENCODE(0xBA77E129,0x7E6E,0x5eea,0x8e62,0x6aadbe1e624f)
+
+extern struct k_msgq adc_msgq;
+
+int bt_init(void);
 
 #endif
