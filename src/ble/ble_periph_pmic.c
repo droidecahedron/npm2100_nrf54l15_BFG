@@ -41,7 +41,6 @@ k_tid_t ble_thread_id;
 
 #define BT_UUID_PMIC_HUB BT_UUID_DECLARE_128(PMIC_HUB_SERVICE_UUID)
 #define BT_UUID_PMIC_HUB_BOOST_RD_MV BT_UUID_DECLARE_128(BOOST_RD_MV_CHARACTERISTIC_UUID)
-#define BT_UUID_PMIC_HUB_BOOST_WR_MV BT_UUID_DECLARE_128(BOOST_WR_MV_CHARACTERISTIC_UUID)
 #define BT_UUID_PMIC_HUB_LSLDO_RD_MV BT_UUID_DECLARE_128(LSLDO_RD_MV_CHARACTERISTIC_UUID)
 #define BT_UUID_PMIC_HUB_LSLDO_WR_MV BT_UUID_DECLARE_128(LSLDO_WR_MV_CHARACTERISTIC_UUID)
 #define BT_UUID_BATT_RD BT_UUID_DECLARE_128(BATT_RD_CHARACTERISTIC_UUID)
@@ -81,21 +80,6 @@ static void on_cccd_changed(const struct bt_gatt_attr *attr, uint16_t value)
     }
 }
 
-// fn called when boost wr characteristic has been written to by a client
-static ssize_t on_receive_boost_wr(struct bt_conn *conn, const struct bt_gatt_attr *attr, const void *buf, uint16_t len,
-                                   uint16_t offset, uint8_t flags)
-{
-    const uint8_t *buffer = buf;
-
-    printk("Received boost wr data, handle %d, conn %p, data: 0x", attr->handle, conn);
-    for (uint8_t i = 0; i < len; i++)
-    {
-        printk("%02X", buffer[i]);
-    }
-
-    return len;
-}
-
 // fn called when lsldo wr characteristic has been written to by a client
 static ssize_t on_receive_lsldo_wr(struct bt_conn *conn, const struct bt_gatt_attr *attr, const void *buf, uint16_t len,
                                    uint16_t offset, uint8_t flags)
@@ -116,9 +100,6 @@ BT_GATT_SERVICE_DEFINE(
 
     BT_GATT_CHARACTERISTIC(BT_UUID_PMIC_HUB_BOOST_RD_MV, BT_GATT_CHRC_NOTIFY, BT_GATT_PERM_READ, NULL, NULL, NULL),
     BT_GATT_CCC(on_cccd_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
-
-    BT_GATT_CHARACTERISTIC(BT_UUID_PMIC_HUB_BOOST_WR_MV, BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
-                           BT_GATT_PERM_READ | BT_GATT_PERM_WRITE, NULL, on_receive_boost_wr, NULL),
 
     BT_GATT_CHARACTERISTIC(BT_UUID_PMIC_HUB_LSLDO_RD_MV, BT_GATT_CHRC_NOTIFY, BT_GATT_PERM_READ, NULL, NULL, NULL),
     BT_GATT_CCC(on_cccd_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
@@ -201,7 +182,7 @@ static void ble_report_boost_mv(struct bt_conn *conn, const uint32_t *data, uint
 
 static void ble_report_lsldo_mv(struct bt_conn *conn, const uint32_t *data, uint16_t len)
 {
-    const struct bt_gatt_attr *attr = &pmic_hub.attrs[5];
+    const struct bt_gatt_attr *attr = &pmic_hub.attrs[5]; // !TODO DBG check these in TABLE for indexes. verify if we want to be able to change BOOST.
 
     struct bt_gatt_notify_params params = {
         .uuid = BT_UUID_PMIC_HUB_LSLDO_RD_MV, .attr = attr, .data = data, .len = len, .func = NULL};
