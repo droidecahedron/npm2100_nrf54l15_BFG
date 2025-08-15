@@ -3,6 +3,6 @@
 
 #include <zephyr/kernel.h>
 
-extern k_tid_t ble_thread_id;
+extern const k_tid_t ble_write_thread_id;
 
 #endif // THREADS_H

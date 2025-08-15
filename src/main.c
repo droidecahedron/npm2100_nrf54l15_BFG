@@ -14,10 +14,13 @@
 #include <zephyr/logging/log.h>
 
 #include "threads.h"
+#include "tsync.h"
 
 LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
 #define DK_STATUS_LED DK_LED1
+K_SEM_DEFINE(sem_gpio_ready, 0, 1);
+
 
 int main(void)
 {
@@ -30,7 +33,8 @@ int main(void)
         LOG_ERR("LEDs init failed (err %d)", err);
         return -1;
     }
-    k_wakeup(ble_thread_id);
+
+    k_sem_give(&sem_gpio_ready);
 
     for (;;)
     {

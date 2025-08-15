@@ -28,10 +28,9 @@
 #include "ble_periph_pmic.h"
 #include "npm_adc.h"
 #include "threads.h"
+#include "tsync.h"
 
 LOG_MODULE_REGISTER(ble, LOG_LEVEL_INF);
-
-k_tid_t ble_thread_id;
 
 #define BLE_STATE_LED DK_LED2
 
@@ -43,7 +42,7 @@ k_tid_t ble_thread_id;
 #define BT_UUID_PMIC_HUB_BOOST_RD_MV BT_UUID_DECLARE_128(BOOST_RD_MV_CHARACTERISTIC_UUID)
 #define BT_UUID_PMIC_HUB_LSLDO_RD_MV BT_UUID_DECLARE_128(LSLDO_RD_MV_CHARACTERISTIC_UUID)
 #define BT_UUID_PMIC_HUB_LSLDO_WR_MV BT_UUID_DECLARE_128(LSLDO_WR_MV_CHARACTERISTIC_UUID)
-#define BT_UUID_BATT_RD BT_UUID_DECLARE_128(BATT_RD_CHARACTERISTIC_UUID)
+#define BT_UUID_PMIC_HUB_BATT_RD BT_UUID_DECLARE_128(BATT_RD_CHARACTERISTIC_UUID)
 
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME // from prj.conf
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
@@ -91,6 +90,7 @@ static ssize_t on_receive_lsldo_wr(struct bt_conn *conn, const struct bt_gatt_at
     {
         printk("%02X", buffer[i]);
     }
+    printk("\n");
 
     return len;
 }
@@ -107,7 +107,7 @@ BT_GATT_SERVICE_DEFINE(
     BT_GATT_CHARACTERISTIC(BT_UUID_PMIC_HUB_LSLDO_WR_MV, BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
                            BT_GATT_PERM_READ | BT_GATT_PERM_WRITE, NULL, on_receive_lsldo_wr, NULL),
 
-    BT_GATT_CHARACTERISTIC(BT_UUID_BATT_RD, BT_GATT_CHRC_NOTIFY, BT_GATT_PERM_READ, NULL, NULL, NULL),
+    BT_GATT_CHARACTERISTIC(BT_UUID_PMIC_HUB_BATT_RD, BT_GATT_CHRC_NOTIFY, BT_GATT_PERM_READ, NULL, NULL, NULL),
     BT_GATT_CCC(on_cccd_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE), );
 
 // BT globals and callbacks
@@ -182,7 +182,7 @@ static void ble_report_boost_mv(struct bt_conn *conn, const uint32_t *data, uint
 
 static void ble_report_lsldo_mv(struct bt_conn *conn, const uint32_t *data, uint16_t len)
 {
-    const struct bt_gatt_attr *attr = &pmic_hub.attrs[5]; // !TODO DBG check these in TABLE for indexes. verify if we want to be able to change BOOST.
+    const struct bt_gatt_attr *attr = &pmic_hub.attrs[5];
 
     struct bt_gatt_notify_params params = {
         .uuid = BT_UUID_PMIC_HUB_LSLDO_RD_MV, .attr = attr, .data = data, .len = len, .func = NULL};
@@ -198,6 +198,25 @@ static void ble_report_lsldo_mv(struct bt_conn *conn, const uint32_t *data, uint
     else
     {
         LOG_WRN("Warning, notification not enabled for lsldo mv characteristic");
+    }
+}
+
+static void ble_report_batt_mv(struct bt_conn *conn, const uint32_t *data, uint16_t len)
+{
+    const struct bt_gatt_attr *attr = &pmic_hub.attrs[9];
+    struct bt_gatt_notify_params params = {
+        .uuid = BT_UUID_PMIC_HUB_BATT_RD, .attr = attr, .data = data, .len = len, .func = NULL};
+
+    if (bt_gatt_is_subscribed(conn, attr, BT_GATT_CCC_NOTIFY))
+    {
+        if (bt_gatt_notify_cb(conn, &params))
+        {
+            LOG_ERR("Error, unable to send notification");
+        }
+    }
+    else
+    {
+        LOG_WRN("Warning, notification not enabled for batt read characteristic");
     }
 }
 
@@ -226,11 +245,16 @@ int bt_init(void)
 
 void ble_write_thread(void)
 {
-    ble_thread_id = k_current_get();
-    k_sleep(K_FOREVER);
+    LOG_INF("ble write thread: enter");
+    k_sem_take(&sem_gpio_ready, K_FOREVER);
+    LOG_INF("ble write thread: woken by main");
 
-    int bt_init(void);
+    if(bt_init() != 0) 
+    {
+        LOG_ERR("unable to initialize BLE!");
+    }
     struct adc_sample_msg msg;
+    int32_t dbg_sim_batv = 0;
     for (;;)
     {
         // Wait indefinitely for a new ADC sample message from the queue
@@ -243,6 +267,8 @@ void ble_write_thread(void)
         {
             ble_report_boost_mv(m_connection_handle, &msg.channel_mv[0], sizeof(msg.channel_mv[0]));
             ble_report_lsldo_mv(m_connection_handle, &msg.channel_mv[1], sizeof(msg.channel_mv[1]));
+            ble_report_batt_mv(m_connection_handle,&dbg_sim_batv, sizeof(dbg_sim_batv));
+            dbg_sim_batv++;
         }
         else
         {
