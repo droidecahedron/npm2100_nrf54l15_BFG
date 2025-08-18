@@ -27,10 +27,13 @@
 
 #include "ble_periph_pmic.h"
 #include "npm_adc.h"
+#include "pmic.h"
 #include "threads.h"
 #include "tsync.h"
 
 LOG_MODULE_REGISTER(ble, LOG_LEVEL_INF);
+
+K_SEM_DEFINE(sem_ble_ready, 0, 1);
 
 #define BLE_STATE_LED DK_LED2
 
@@ -201,7 +204,7 @@ static void ble_report_lsldo_mv(struct bt_conn *conn, const uint32_t *data, uint
     }
 }
 
-static void ble_report_batt_mv(struct bt_conn *conn, const uint32_t *data, uint16_t len)
+static void ble_report_batt_soc(struct bt_conn *conn, const uint32_t *data, uint16_t len)
 {
     const struct bt_gatt_attr *attr = &pmic_hub.attrs[9];
     struct bt_gatt_notify_params params = {
@@ -249,26 +252,30 @@ void ble_write_thread(void)
     k_sem_take(&sem_gpio_ready, K_FOREVER);
     LOG_INF("ble write thread: woken by main");
 
-    if(bt_init() != 0) 
+    if (bt_init() != 0)
     {
         LOG_ERR("unable to initialize BLE!");
     }
-    struct adc_sample_msg msg;
-    int32_t dbg_sim_batv = 0;
+    k_sem_give(&sem_ble_ready);
+    struct adc_sample_msg adc_msg;
+    struct pmic_report_msg pmic_msg;
     for (;;)
     {
-        // Wait indefinitely for a new ADC sample message from the queue
-        k_msgq_get(&adc_msgq, &msg, K_FOREVER);
-        // At this point, msg.channel_mv[0] and msg.channel_mv[1] contain the
-        // latest ADC results
-        LOG_INF("BLE thread received: Ch0(BOOST)=%d mV, Ch1(LDOLS)=%d mV", msg.channel_mv[0], msg.channel_mv[1]);
+        // Wait indefinitely for msg's from other modules
+        k_msgq_get(&adc_msgq, &adc_msg, K_FOREVER);
+        // msg.channel_mv[0] and msg.channel_mv[1] contain latest ADC results
+        LOG_INF("BLE thread rx from ADC: Ch0(BOOST)=%d mV Ch1(LDOLS)=%d mV", adc_msg.channel_mv[0],
+                adc_msg.channel_mv[1]);
+
+        k_msgq_get(&pmic_msgq, &pmic_msg, K_FOREVER);
+        LOG_INF("BLE thread rx from PMIC: V: %d T: %d SoC: %d ", pmic_msg.batt_voltage, pmic_msg.temp,
+                pmic_msg.batt_soc);
 
         if (m_connection_handle) // if ble connection present
         {
-            ble_report_boost_mv(m_connection_handle, &msg.channel_mv[0], sizeof(msg.channel_mv[0]));
-            ble_report_lsldo_mv(m_connection_handle, &msg.channel_mv[1], sizeof(msg.channel_mv[1]));
-            ble_report_batt_mv(m_connection_handle,&dbg_sim_batv, sizeof(dbg_sim_batv));
-            dbg_sim_batv++;
+            ble_report_boost_mv(m_connection_handle, &adc_msg.channel_mv[0], sizeof(adc_msg.channel_mv[0]));
+            ble_report_lsldo_mv(m_connection_handle, &adc_msg.channel_mv[1], sizeof(adc_msg.channel_mv[1]));
+            ble_report_batt_soc(m_connection_handle, &pmic_msg.batt_soc, sizeof(pmic_msg.batt_soc));
         }
         else
         {

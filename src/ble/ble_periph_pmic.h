@@ -12,6 +12,7 @@
 #define BATT_RD_CHARACTERISTIC_UUID     BT_UUID_128_ENCODE(0xBA77E129, 0x2EAD,0x5eea,0x8e62,0x6aadbe1e624f)
 
 extern struct k_msgq adc_msgq;
+extern struct k_msgq pmic_msgq;
 
 int bt_init(void);
 

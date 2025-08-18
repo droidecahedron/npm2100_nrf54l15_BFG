@@ -21,7 +21,6 @@ LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 #define DK_STATUS_LED DK_LED1
 K_SEM_DEFINE(sem_gpio_ready, 0, 1);
 
-
 int main(void)
 {
     int err;
@@ -35,6 +34,7 @@ int main(void)
     }
 
     k_sem_give(&sem_gpio_ready);
+    k_sem_take(&sem_ble_ready, K_FOREVER);
 
     for (;;)
     {
