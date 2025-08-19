@@ -106,7 +106,7 @@ static ssize_t on_receive_lsldo_wr(struct bt_conn *conn, const struct bt_gatt_at
     else
     {
         LOG_INF("REQUESTED LSLDO VOLTAGE (MV): %d", requested_lsldo_mv);
-        k_msgq_put(&pmic_msgq, &requested_lsldo_mv, K_NO_WAIT);
+        k_msgq_put(&ble_cfg_pmic_msgq, &requested_lsldo_mv, K_NO_WAIT);
     }
 
     return len;
