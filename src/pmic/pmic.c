@@ -14,6 +14,8 @@
 #include <zephyr/device.h>
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/drivers/sensor/npm2100_vbat.h>
+#include <zephyr/drivers/mfd/npm2100.h>
+#include <zephyr/drivers/regulator.h>
 #include <zephyr/sys/util.h>
 
 #include "pmic.h"
@@ -27,6 +29,8 @@
 LOG_MODULE_REGISTER(pmic, LOG_LEVEL_INF);
 
 K_MSGQ_DEFINE(pmic_msgq, sizeof(struct pmic_report_msg), 8, 4);
+
+static const struct device *regulators = DEVICE_DT_GET(DT_NODELABEL(npm2100ek_regulators));
 
 static const struct device *vbat = DEVICE_DT_GET(DT_NODELABEL(npm2100ek_vbat));
 static enum battery_type battery_model;
@@ -211,5 +215,28 @@ int pmic_fg_thread(void)
     }
 }
 
+//wait forever 
+int pmic_reg_thread(void)
+{
+    int err, requested_lsldo_uv;
+    int requested_lsldo_mv = -1;
+    for(;;)
+    {
+        k_msgq_get(&pmic_msgq, &requested_lsldo_mv, K_FOREVER); // suspend till msg avail
+        requested_lsldo_uv = requested_lsldo_mv*1000;  // api wants uV
+        err = regulator_set_voltage(regulators, requested_lsldo_uv, requested_lsldo_uv);
+        if(err)
+        {
+            LOG_ERR("Failed to set regulator voltage: %d uV", requested_lsldo_uv);
+        }
+        else
+        {
+            LOG_INF("LSLDO Voltage set to: %d uV", requested_lsldo_uv);
+        }
+    }
+}
+
+K_THREAD_DEFINE(pmic_reg_thread_id, PMIC_THREAD_STACK_SIZE, pmic_reg_thread, NULL, NULL, NULL, PMIC_THREAD_PRIORITY, 0,
+                0);
 K_THREAD_DEFINE(pmic_fg_thread_id, PMIC_THREAD_STACK_SIZE, pmic_fg_thread, NULL, NULL, NULL, PMIC_THREAD_PRIORITY, 0,
                 0);

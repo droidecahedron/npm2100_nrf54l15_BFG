@@ -13,6 +13,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/byteorder.h>
+#include <zephyr/sys/util.h>
 #include <zephyr/types.h>
 
 #include <zephyr/bluetooth/conn.h>
@@ -32,7 +33,7 @@
 #include "tsync.h"
 
 LOG_MODULE_REGISTER(ble, LOG_LEVEL_INF);
-
+K_MSGQ_DEFINE(ble_cfg_pmic_msgq, sizeof(int32_t), 8, 4);
 K_SEM_DEFINE(sem_ble_ready, 0, 1);
 
 #define BLE_STATE_LED DK_LED2
@@ -94,6 +95,19 @@ static ssize_t on_receive_lsldo_wr(struct bt_conn *conn, const struct bt_gatt_at
         printk("%02X", buffer[i]);
     }
     printk("\n");
+    // We can't write values bigger than 3000 mV. Just look at the first two bytes,
+    //
+    int32_t requested_lsldo_mv = bcd2bin(buffer[0]) * 100 + bcd2bin(buffer[1]);
+    if (requested_lsldo_mv < 800 || requested_lsldo_mv > 3000)
+    {
+        //the devicetree will assert this with regulator-min/max-microvolt but check anyway.
+        LOG_ERR("requested lsldo voltage out of bounds (800-3000mv)");
+    }
+    else
+    {
+        LOG_INF("REQUESTED LSLDO VOLTAGE (MV): %d", requested_lsldo_mv);
+        k_msgq_put(&pmic_msgq, &requested_lsldo_mv, K_NO_WAIT);
+    }
 
     return len;
 }
