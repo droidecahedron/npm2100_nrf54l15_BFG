@@ -20,9 +20,9 @@ enum battery_type {
 
 struct pmic_report_msg
 {
-    int32_t batt_voltage;
-	int32_t temp;
-	int32_t batt_soc;
+    double batt_voltage;
+	double temp;
+	double batt_soc;
 };
 
 extern struct k_msgq ble_cfg_pmic_msgq;
