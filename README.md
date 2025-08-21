@@ -58,12 +58,12 @@ Battery Temp|Read|deg C|No
   <img width="363" height="110" alt="image" src="https://github.com/user-attachments/assets/f7383732-c6e0-4941-b508-de606ff5969e" />
   
 - Using your female-female jumper wires, connect the following:
-  - `Port P1 Pin 11` of the nRF54L15DK to the `VOUT` header on the nPM2100EK
-  - `Port P1 Pin 12` of the nRF54L15DK to the `LS/LDO OUT` header on the nPM2100EK
-  - `Port P1 Pin 9` of the nRF54L15DK to the `SDA` pin of the `TWI` header on the nPM2100EK
-  - `Port P1 Pin 8` of the nRF54L15DK to the `SCL` pin of the `TWI` header on the nPM2100EK
-  - The **middle** pin of the `VDDM current measure` header on the nRF54L15DK to the `VOUT` pin of the `TWI` header on the nPM2100EK 
-  - and tie the GNDs of the kits together. Below is a table summary, an image summary, and a photo of how it should be wired together.
+  - `Port P1 Pin 11` of the **nRF54L15DK** to the `VOUT` header on the **nPM2100EK**
+  - `Port P1 Pin 12` of the **nRF54L15DK** to the `LS/LDO OUT` header on the **nPM2100EK**
+  - `Port P1 Pin 9` of the **nRF54L15DK** to the `SDA` pin of the `TWI` header on the **nPM2100EK**
+  - `Port P1 Pin 8` of the **nRF54L15DK** to the `SCL` pin of the `TWI` header on the **nPM2100EK**
+  - The __middle__ pin of the `VDDM current measure` header on the nRF54L15DK to the `VOUT` pin of the `TWI` header on the nPM2100EK 
+  - and tie the GNDs of the kits together. _Below is a table summary, an image summary, and a photo of how it should be wired together._
 
 #### Battery Configuration
 
