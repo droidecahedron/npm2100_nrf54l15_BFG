@@ -431,7 +431,7 @@ void ble_write_thread(void)
             ble_report_batt_soc(m_connection_handle, &battcharge, sizeof(battcharge));
             static uint8_t ble_pmic_stat[MAXLEN]; // string to hold plaintext pmic report
             int len = snprintf(ble_pmic_stat, MAXLEN,
-                               "BATT: %.2f%% , BATTV: %.2fV , TEMP: %.2fC | LDO: %dmV , BOOST: %dmV", pmic_msg.batt_soc,
+                               "BATT: %.2f%% , BATTV: %.2fV , TEMP: %.2fC  | LDO: %dmV , BOOST: %dmV", pmic_msg.batt_soc,
                                pmic_msg.batt_voltage, pmic_msg.temp, adc_msg.channel_mv[1], adc_msg.channel_mv[0]);
             if (!(len >= 0 && len < MAXLEN))
             {
