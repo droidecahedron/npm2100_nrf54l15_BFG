@@ -200,7 +200,7 @@ int pmic_fg_thread(void)
         LOG_ERR("vbat device not ready.");
         return 0;
     }
-    if(regulator_enable(npm2100_lsldo_regulator))
+    if (regulator_enable(npm2100_lsldo_regulator))
     {
         LOG_ERR("unable to enable regulator!");
     }
