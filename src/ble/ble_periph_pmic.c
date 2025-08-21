@@ -39,7 +39,7 @@ K_SEM_DEFINE(sem_ble_ready, 0, 1);
 
 #define BLE_STATE_LED DK_LED2
 
-#define BLE_NOTIFY_INTERVAL K_MSEC(500)
+#define BLE_NOTIFY_INTERVAL K_MSEC(1000)
 #define BLE_THREAD_STACK_SIZE 1024
 #define BLE_THREAD_PRIORITY 5
 
@@ -284,6 +284,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 {
     LOG_INF("Disconnected (reason %u)", reason);
     bt_conn_unref(m_connection_handle);
+    m_connection_handle = NULL;
     dk_set_led_off(BLE_STATE_LED);
 }
 

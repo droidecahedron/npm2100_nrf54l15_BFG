@@ -5,5 +5,6 @@
 
 extern struct k_sem sem_ble_ready;
 extern struct k_sem sem_gpio_ready;
+extern struct k_sem sem_pmic_ready;
 
 #endif // TSYNC_H

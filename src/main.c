@@ -6,10 +6,10 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+#include <dk_buttons_and_leds.h>
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/kernel.h>
-#include <dk_buttons_and_leds.h>
 
 #include <zephyr/logging/log.h>
 
@@ -33,6 +33,7 @@ int main(void)
         return -1;
     }
 
+    k_sem_take(&sem_pmic_ready, K_FOREVER);
     k_sem_give(&sem_gpio_ready);
     k_sem_take(&sem_ble_ready, K_FOREVER);
 

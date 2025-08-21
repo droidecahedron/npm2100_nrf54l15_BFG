@@ -30,10 +30,11 @@
 LOG_MODULE_REGISTER(pmic, LOG_LEVEL_INF);
 
 K_MSGQ_DEFINE(pmic_msgq, sizeof(struct pmic_report_msg), 8, 4);
+K_SEM_DEFINE(sem_pmic_ready, 0, 1);
 
 static const struct device *npm2100_lsldo_regulator = DEVICE_DT_GET(DT_NODELABEL(npm2100ek_ldosw));
-
 static const struct device *vbat = DEVICE_DT_GET(DT_NODELABEL(npm2100ek_vbat));
+
 static enum battery_type battery_model;
 static bool fuel_gauge_initialized;
 
@@ -204,6 +205,7 @@ int pmic_fg_thread(void)
         LOG_ERR("unable to enable regulator!");
     }
     LOG_INF("PMIC device ok");
+    k_sem_give(&sem_pmic_ready);
 
     for (;;)
     {
