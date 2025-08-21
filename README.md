@@ -16,9 +16,9 @@
 
    <img src="https://github.com/user-attachments/assets/b0fb8940-37a9-4051-812e-5c0ff0203e20" width=15% >
 
-- **AA Battery** (other types work as well, see the `Battery Configuration` section) 
+- **AA Battery** (other types work as well, see the [Battery Configuration](#battery-configuration) section) 
 
-- 6x Female-Female jumper wires
+- **6x Female-Female jumper wires**
 
 ## Software
 - nRF Connect SDK `V3.0.2` (or grab a tagged release `.hex` and program your DK with nrfutil device or nrf programmer in nrf desktop or jlink)
@@ -33,14 +33,14 @@ The nPM2100EK and primary cell battery provides power (via BOOST) to the nRF54L1
 The 54L15 uses two on-chip ADC channels and measures the voltage of the BOOST and LDO/LS output of the nPM2100, and reports these statistics to a central device (likely a phone) via BLE. It also reports logs by default, so if you connect a USB cable you can read those logs out.
 
 ## Block Diagram
-### Overall application
+### Overall Application
 <img width="790" height="463" alt="image" src="https://github.com/user-attachments/assets/e7d47d5b-4196-4515-892e-253b9c534f30" />
 
 ### Fuel gauge block diagram
 <img width="493" height="153" alt="image" src="https://github.com/user-attachments/assets/311fb2f6-b230-432c-b026-525681e19da5" />
 
 ## BLE Data
-The regulator output voltages and battery percentage have independent characteristics to read over BLE, but for demonstration purposes there is also an overall encapsulating characeristic to read all the values out as a string. (See the `Example Output` section for more information.) Below is a table summary:
+The regulator output voltages and battery percentage have independent characteristics to read over BLE, but for demonstration purposes there is also an overall encapsulating characeristic to read all the values out as a string. (See the [example output](#example-output) section for more information.) Below is a table summary:
 
 Statistic|Permissions|Unit|Individual Characteristic
 ---|---|---|----
@@ -50,13 +50,25 @@ BOOST Output Voltage|Read|mV|Yes
 Battery Voltage|Read|V|No
 Battery Temp|Read|deg C|No
 
-# Setting up 
+# Setting Up 
 ## Boards
 
-## Battery Configuration
+- Insert your provided battery into its corresponding battery holder, and insert that into the BATTERY INPUT connector on the EK. _This sample is by default configured for the single AA battery board._
+- Remove the jumper on P6 on the `54L15DK`.
+  <img width="363" height="110" alt="image" src="https://github.com/user-attachments/assets/f7383732-c6e0-4941-b508-de606ff5969e" />
+  
+- Using your female-female jumper wires, connect the following:
+  - `Port P1 Pin 11` of the nRF54L15DK to the `VOUT` header on the nPM2100EK
+  - `Port P1 Pin 12` of the nRF54L15DK to the `LS/LDO OUT` header on the nPM2100EK
+  - `Port P1 Pin 9` of the nRF54L15DK to the `SDA` pin of the `TWI` header on the nPM2100EK
+  - `Port P1 Pin 8` of the nRF54L15DK to the `SCL` pin of the `TWI` header on the nPM2100EK
+  - The **middle** pin of the `VDDM current measure` header on the nRF54L15DK to the `VOUT` pin of the `TWI` header on the nPM2100EK 
+  - and tie the GNDs of the kits together. Below is a table summary, an image summary, and a photo of how it should be wired together.
 
-## Building and running
+#### Battery Configuration
 
-# Example output
+## Building and Running
+
+# Example Output
 
 # Software Description
