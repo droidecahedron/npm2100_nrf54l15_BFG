@@ -29,17 +29,22 @@
 - **6x Female-Female jumper wires**
 
 ## Software
-- nRF Connect SDK `V3.0.2`
-  - _(or grab a tagged [release](https://github.com/droidecahedron/npm2100_nrf54l15_BFG/releases) `.hex` and program your DK with `nrfutil device`, nrf programmer in nrf Connect for Desktop, or `jlink.exe`)_
-- nRF Connect for Mobile (Link) for iOS/Android
+- [nRF Connect SDK](https://www.nordicsemi.com/Products/Development-software/nRF-Connect-SDK) `V3.0.2` to build and program.
+  - Alternatively, grab a tagged release `.hex` file [here](https://github.com/droidecahedron/npm2100_nrf54l15_BFG/releases) and program your DK with either:
+    -  [nRF Util](https://www.nordicsemi.com/Products/Development-tools/nRF-Util) and `nrfutil device program`
+    -  [nRF Connect for Desktop](https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop/download)'s Programmer application <img width="25%" height="46" alt="image" src="https://github.com/user-attachments/assets/1ec0208f-ae00-4a22-b88e-67fdd76c1dd6" />
+
+      
+    -  or [J-Link](https://www.segger.com/downloads/jlink/).
+- [nRF Connect for Mobile](https://www.nordicsemi.com/Products/Development-tools/nRF-Connect-for-mobile) for iOS/Android
 
 # Overview
-The nRF54L15 is a very low power wireless SoC, and the nPM2100 is an efficient boost regulator for primary-cell batteries.
+The nRF54L15 is an ultra low power wireless SoC, and the nPM2100 is an efficient boost regulator for primary-cell batteries.
 The nPM2100 also has two output regulators, a boost and LDO/load switch.
 
 The nPM2100-EK and primary cell battery provides power (via BOOST) to the nRF54L15-DK, and the nRF54L15-DK performs measurements, configurations, and acts as a BLE peripheral.
 
-The 54L15 uses two on-chip ADC channels and measures the voltage of the BOOST and LDO/LS output of the nPM2100, and reports these statistics to a central device (likely a phone) via BLE. It also reports logs by default, so if you connect a USB cable you can read those logs out.
+The nRF54L15 uses two on-chip ADC channels and measures the voltage of the BOOST and LDO/LS output of the nPM2100, and reports these statistics to a central device (likely a phone) via BLE. It also reports logs by default, so if you connect a USB cable you can read those logs out.
 
 ## Block Diagram
 ### Overall Application
@@ -49,7 +54,7 @@ The 54L15 uses two on-chip ADC channels and measures the voltage of the BOOST an
 <img width="493" height="153" alt="image" src="https://github.com/user-attachments/assets/311fb2f6-b230-432c-b026-525681e19da5" />
 
 ## BLE Data
-The regulator output voltages and battery percentage have independent characteristics to read over BLE, but for demonstration purposes there is also an overall encapsulating characeristic to read all the values out as a string. (See the [example output](#example-output) section for more information.) Below is a table summary:
+The regulator output voltages and battery percentage have independent characteristics to read over BLE, but for demonstration purposes there is a summary characteristic to read all the values out as a string. (See the [example output](#example-output) section for more information.) Below is a table summary:
 
 Statistic|Permissions|Unit|Individual Characteristic
 ---|---|---|----
@@ -80,7 +85,7 @@ Battery Temp|Read|deg C|No
 >[!NOTE]
 > You can run this application WITHOUT the USB cable attached. _You will not see LEDs blink if not connected via USB due to how the DK/EK are designed._
 >
-> If the board is already programmed, power the **54L15-DK** OFF with `SW4`, unplug the USB cable from the DK, then switch it back on.
+> If the board is already programmed, power the **nRF54L15-DK** OFF with `SW4`, unplug the USB cable from the DK, then switch it back on.
 
  ### Table of Connections
  Helpful silk screen labels in parenthesis
@@ -117,9 +122,11 @@ Based on this config, the fuel gauge initialization in `pmic.c` should pull the 
 
 ## Building and Running
 This application is built like all other typical nRF Connect SDK applications.
-`west build -b nrf54l15dk/nrf54l15/cpuapp -p always --` followed by `west flash`
+To build the sample, follow the instructions in [Building an application](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/building.html#building) for your preferred building environment. See also [Programming an application](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/programming.html#programming) for programming steps.
 
-Use the nRF Connect for Mobile app and scan for "npm" to find `npm2100_nrf54l15_BFG` (which is the name set in `prj.conf`).
+`west build -b nrf54l15dk/nrf54l15/cpuapp -p` followed by `west flash`.
+
+Use the nRF Connect for Mobile app and use the scan filter for "npm" to find `npm2100_nrf54l15_BFG` (which is the name set in `prj.conf`).
 
 <p align="center">
   <img width="35%" height="1334" alt="image" src="https://github.com/user-attachments/assets/6595cb22-8849-4c38-8949-8735c458c6f1" />
@@ -132,15 +139,15 @@ Below is a helpful table to navigate them, since they have unrecognized UUIDs em
 Characteristic|UUID prefix|Purpose|Data type
 ---|---|---|---
 **2100 Read All**|`0x21002EAD-0xA770`|Plaintext "read all" of pmic values (batt%, die temp, battV) and measured ADC values of the pmic regulator outputs|String
-BOOST Read|`0xB005712D-0x2EAD`|Measured ADC result of the 2100 BOOST regulator output in mV|signed int
-LS/LDO Read|`0xL5LD012D-0x2EAD`|Measured ADC result of the 2100 LDO/LS regulator output in mV|signed int
+BOOST Read|`0xB005712D-0x2EAD`|Measured ADC result of the nPM2100 BOOST regulator output in mV|signed int
+LS/LDO Read|`0xL5LD012D-0x2EAD`|Measured ADC result of the nPM2100 LDO/LS regulator output in mV|signed int
 **LS/LDO Write**|`0x757D0111-0x217E`|Lets you request a change in the LS/LDO output voltage in mV|byte array
 Battery Read|`0xBA77E129-0x2EAD`|Measured the battery% of the fuel gauge|unsigned int
 
 > [!IMPORTANT]
 > 1. For the read characteristics, the nRF Connect for Mobile lets you change the formatting to make it easier to read the values, since by default it will be byte arrays. 
 >   (on iOS it is the little `"` symbol.)
-> 2. For the LS/LDO Write characteristic, the LDO only accepts steps of 100mv. So to request 2300mV, you need to write `2300`. (Fun quirk you should be able to just enter 23 as well.)
+> 2. For the LS/LDO Write characteristic, the LDO only accepts steps of 100mv. So to request 2300mV, you need to write `2300`.
 >    
 >    If you request anything that is not in a step of 100mV, the device will ignore your request, and will output an error log message.
 >
@@ -294,7 +301,7 @@ flowchart LR
 
 # Notes
 > [!IMPORTANT]
->Although this sample uses a battery, it is **not** optimized for power. The 54L15 has great active power numbers but this sample does not incorporate power saving techniques.
+>Although this sample uses a battery, it is **not** optimized for power. The nRF54L15 has great active power numbers but this sample does not incorporate power saving techniques.
 >
 > I omitted power saving features to avoid the codebase becoming too dense. You can see some examples of power optimzation techniques in the list below.
 
