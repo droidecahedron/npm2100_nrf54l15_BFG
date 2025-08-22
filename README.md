@@ -63,7 +63,7 @@ Battery Temp|Read|deg C|No
 - Remove the jumper on `P6` on the **nRF54L15-DK**.
   - <img width="363" height="110" alt="image" src="https://github.com/user-attachments/assets/f7383732-c6e0-4941-b508-de606ff5969e" />
 - Plug in the USB cable to the **nRF54L15-DK**. (_Omit if the device is programmed and you want the boards to be mobile._)
-- Using your female-female jumper wires, connect the following:
+- Using your female-female jumper wires, make the following connections between the boards:
   - `Port P1 Pin 11` of the **nRF54L15-DK** to the `VOUT` header on the **nPM2100-EK**
   - `Port P1 Pin 12` of the **nRF54L15-DK** to the `LS/LDO OUT` header on the **nPM2100-EK**
   - `Port P1 Pin 9` of the **nRF54L15-DK** to the `SDA` pin of the `TWI` header on the **nPM2100-EK**
