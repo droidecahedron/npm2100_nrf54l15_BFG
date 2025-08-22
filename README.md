@@ -9,6 +9,7 @@
 </p>
 
 > I am in no way affiliated with Id Software.
+> 
 > The acronym for **B**luetooth **F**uel **G**auge is coincidentally also DOOM reference so I could not resist.
 
 
