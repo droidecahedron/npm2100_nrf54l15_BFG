@@ -146,8 +146,9 @@ Battery Read|`0xBA77E129-0x2EAD`|Measured the battery% of the fuel gauge|unsigne
 
 > [!IMPORTANT]
 > 1. For the read characteristics, the nRF Connect for Mobile lets you change the formatting to make it easier to read the values, since by default it will be byte arrays. 
->   (on iOS it is the little `"` symbol.)
-> 2. For the LS/LDO Write characteristic, the LDO only accepts steps of 100mv. So to request 2300mV, you need to write `2300`.
+>   (on iOS it is the little `"` symbol.). Select UTF-8 for the READ ALL characteristic to see a human readable string.
+
+> 3. For the LS/LDO Write characteristic, the LDO only accepts steps of 100mv. So to request 2300mV, you need to write `2300`.
 >    
 >    If you request anything that is not in a step of 100mV, the device will ignore your request, and will output an error log message.
 >
