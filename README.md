@@ -30,7 +30,7 @@
 
 ## Software
 - nRF Connect SDK `V3.0.2`
-  - _(or grab a tagged release `.hex` and program your DK with `nrfutil device`, nrf programmer in nrf Connect for Desktop, or `jlink.exe`)_
+  - _(or grab a tagged [release](https://github.com/droidecahedron/npm2100_nrf54l15_BFG/releases) `.hex` and program your DK with `nrfutil device`, nrf programmer in nrf Connect for Desktop, or `jlink.exe`)_
 - nRF Connect for Mobile (Link) for iOS/Android
 
 # Overview
