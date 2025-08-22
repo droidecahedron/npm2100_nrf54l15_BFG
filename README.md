@@ -262,8 +262,9 @@ All other notification information fits without needing it.
 
 PHY negotiation is also present, the sample prefers CODED PHY by default if available. 
 Since the transmitted data is minimal, the lowered bitrates aren't much of a dealbreaker in exchange for link robustness.
+The ADC portion is using standard Zephyr API. 
 
-ADC module is using standard Zephyr API. For a step-by-step guide on the ADC module and BLE characteristics, visit this step-by-step workshop [peripheral_dmm](https://github.com/droidecahedron/nrf_peripheral_dmm/tree/main), or the [Nordic DevAcademy](https://academy.nordicsemi.com/).
+For a step-by-step guide on the ADC module and BLE characteristics, visit this step-by-step workshop [peripheral_dmm](https://github.com/droidecahedron/nrf_peripheral_dmm/tree/main), or the [Nordic DevAcademy](https://academy.nordicsemi.com/).
 
 There are 4 primary modules:
 1) main
