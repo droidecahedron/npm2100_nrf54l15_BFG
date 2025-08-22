@@ -9,7 +9,10 @@
 </p>
 
 > I am in no way affiliated with Id Software.
+> 
 > The acronym for **B**luetooth **F**uel **G**auge is coincidentally also a DOOM reference and I could not resist.
+> 
+> _Although DOOM was ported to the 5340: [DOOM on nRF5340](https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/doom-on-nrf5340)_
 
 
 # Requirements
