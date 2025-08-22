@@ -263,6 +263,13 @@ Received lsldo wr data, handle 0, conn 0x20002888, data: 0x2400
 [00:00:02.029,514] <wrn> ble: Warning, notification not enabled for pmic stat characteristic
 ```
 
+#### Disconnected
+```
+[00:01:26.449,365] <inf> ble: Disconnected (reason 19)
+[00:01:26.449,389] <inf> ble: Connection object available from previous conn. Disconnect is complete!
+[00:01:26.449,855] <inf> ble: Advertising successfully started
+```
+
 
 # Software Description
 Standard BLE peripheral, except larger MTU and DLE is used since the plaintext string is significantly larger than the 20 bytes of payload you can get by default.
