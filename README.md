@@ -62,7 +62,7 @@ Battery Temp|Read|deg C|No
 - Switch the **nRF54L15-DK** Power switch (`SW4`) to OFF.
 - Remove the jumper on `P6` on the **nRF54L15-DK**.
   - <img width="363" height="110" alt="image" src="https://github.com/user-attachments/assets/f7383732-c6e0-4941-b508-de606ff5969e" />
-- Plug in the USB cable to the **nRF54L15-DK**. (_Omit if the device is programmed and you want the boards to be mobile._)
+- Plug in the USB cable to the **nRF54L15-DK**. (_Read the NOTE after the last instruction_.)
 - Using your female-female jumper wires, make the following connections between the boards:
   - `Port P1 Pin 11` of the **nRF54L15-DK** to the `VOUT` header on the **nPM2100-EK**
   - `Port P1 Pin 12` of the **nRF54L15-DK** to the `LS/LDO OUT` header on the **nPM2100-EK**
@@ -73,7 +73,12 @@ Battery Temp|Read|deg C|No
 
 - Insert your provided battery into its corresponding battery holder, and insert that into the BATTERY INPUT connector on the EK. _This sample is by default configured for the single AA battery board._
 - When everything is connected correctly, switch `SW4` on the **nRF54L15-DK** to `ON`.
-  - _You will not see LEDs blink if not connected via USB. This is due to how the DK/EK are designed._
+- Program the board as with other nRF Connect SDK samples and applications.
+
+>[!NOTE]
+> You can run this application WITHOUT the USB cable attached.
+> _You will not see LEDs blink if not connected via USB. This is due to how the DK/EK are designed._
+> If the board is already programmed, power the **54L15-DK** OFF with `SW4`, unplug the USB cable from the DK, then switch it back on.
 
  ### Table of Connections
  Helpful silk screen labels in parenthesis
@@ -251,7 +256,10 @@ Received lsldo wr data, handle 0, conn 0x20002888, data: 0x2400
 
 # Software Description
 Standard BLE peripheral, except larger MTU and DLE is used since the plaintext string is significantly larger than the 20 bytes of payload you can get by default.
-All other notification information fits without needing it. PHY negotiation is also present, and it prefers CODED PHY if it can be granted it, since it's not a lot of information so the lowered bitrates aren't much of a dealbreaker but more range would be nice.
+All other notification information fits without needing it. 
+
+PHY negotiation is also present, the sample prefers CODED PHY by default if available. 
+Since the transmitted data is minimal, the lowered bitrates aren't much of a dealbreaker in exchange for link robustness.
 
 There are 4 primary modules:
 1) main
