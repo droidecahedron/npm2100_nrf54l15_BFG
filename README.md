@@ -78,8 +78,8 @@ Battery Temp|Read|deg C|No
 - Program the board as with other nRF Connect SDK samples and applications.
 
 >[!NOTE]
-> You can run this application WITHOUT the USB cable attached.
-> _You will not see LEDs blink if not connected via USB. This is due to how the DK/EK are designed._
+> You can run this application WITHOUT the USB cable attached. _You will not see LEDs blink if not connected via USB due to how the DK/EK are designed._
+>
 > If the board is already programmed, power the **54L15-DK** OFF with `SW4`, unplug the USB cable from the DK, then switch it back on.
 
  ### Table of Connections
