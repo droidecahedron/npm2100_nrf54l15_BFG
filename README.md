@@ -1,11 +1,15 @@
 # npm2100_nrf54l15_BFG
 
+
 <p align="center">
   <br>
-  <img width="45%" height="707" alt="image" src="https://github.com/user-attachments/assets/36d7e173-b39f-4e94-a655-fa172a1f2846" />
+  <img width="45%" height="707" alt="image" src="https://github.com/user-attachments/assets/ce2ed98d-f0ab-478d-a471-69dbebc30cb4" />
   </br>
-  This application demonstrates using an nRF54L15 as a Bluetooth Low Energy (BLE) peripheral,  powered by an nPM2100 power management IC (PMIC) and primary cell battery, to be a wireless battery fuel gauge and PMIC controller.
+  This **unofficial** application demonstrates using an nRF54L15 as a Bluetooth Low Energy (BLE) peripheral,  powered by an nPM2100 power management IC (PMIC) and primary cell battery, to be a wireless battery fuel gauge and PMIC controller.
 </p>
+
+> This project and I am in no way affiliated with Id Software, the acronym for **B**luetooth **F**uel **G**auge just happens to be a DOOM reference and I could not resist.
+
 
 # Requirements
 ## Hardware
