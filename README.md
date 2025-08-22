@@ -8,7 +8,8 @@
   This <b>unofficial</b> application demonstrates using an nRF54L15 as a Bluetooth Low Energy (BLE) peripheral,  powered by an nPM2100 power management IC (PMIC) and primary cell battery, to be a wireless battery fuel gauge and PMIC controller.
 </p>
 
-> I am in no way affiliated with Id Software. The acronym for **B**luetooth **F**uel **G**auge is coincidentally also DOOM reference so I could not resist.
+> I am in no way affiliated with Id Software.
+> The acronym for **B**luetooth **F**uel **G**auge is coincidentally also DOOM reference so I could not resist.
 
 
 # Requirements
