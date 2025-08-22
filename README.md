@@ -288,7 +288,10 @@ flowchart LR
 
 # Notes
 > [!IMPORTANT]
->Although this sample uses a battery, it is **not** optimized for power. The 54L15 has great active power numbers but this sample could incorporate more. I omitted power saving features to avoid the codebase becoming too dense. You can see some examples of power optimzation techniques in the list below.
+>Although this sample uses a battery, it is **not** optimized for power. The 54L15 has great active power numbers but this sample does not incorporate power saving techniques.
+>
+> I omitted power saving features to avoid the codebase becoming too dense. You can see some examples of power optimzation techniques in the list below.
+
 1. [i2c_ble_peripheral](https://github.com/droidecahedron/i2c_ble_peripheral/tree/main)
 2. [blinkbuttonsleep and its various branches](https://github.com/droidecahedron/blinkbuttonsleep)
 3. [Nordic official power optimization recommendations](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/test_and_optimize/optimizing/power_general.html)
