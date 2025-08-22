@@ -41,7 +41,7 @@ The 54L15 uses two on-chip ADC channels and measures the voltage of the BOOST an
 
 ## Block Diagram
 ### Overall Application
-<img width="858" height="607" alt="image" src="https://github.com/user-attachments/assets/f3e5fa4d-40a1-4475-9da5-f2f4c7663938" />
+<img width="864" height="604" alt="image" src="https://github.com/user-attachments/assets/06df389d-239a-49f1-9ba4-8d83884fd02d" />
 
 ### Fuel gauge block diagram
 <img width="493" height="153" alt="image" src="https://github.com/user-attachments/assets/311fb2f6-b230-432c-b026-525681e19da5" />
