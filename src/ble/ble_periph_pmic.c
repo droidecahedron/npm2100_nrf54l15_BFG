@@ -127,16 +127,28 @@ static ssize_t on_receive_lsldo_wr(struct bt_conn *conn, const struct bt_gatt_at
                                    uint16_t offset, uint8_t flags)
 {
     const uint8_t *buffer = buf;
+    static int32_t requested_lsldo_mv;
 
-    printk("Received lsldo wr data, handle %d, conn %p, data: 0x", attr->handle, conn);
+    printk("Received lsldo wr data, handle %d, conn %p, len %d, data: 0x", attr->handle, conn, len);
     for (uint8_t i = 0; i < len; i++)
     {
         printk("%02X", buffer[i]);
     }
     printk("\n");
 
-    // We can't write values bigger than 3000 mV. Just look at the first two bytes,
-    int32_t requested_lsldo_mv = bcd2bin(buffer[0]) * 100 + bcd2bin(buffer[1]);
+    // We can't write values bigger than 3000 mV. Just look at the first two bytes.
+    // The nRF Connect for Mobile app will truncate 800/900 as byte arrays to 80/90 single send.
+    if(len>1)
+    {
+        requested_lsldo_mv = bcd2bin(buffer[0]) * 100 + bcd2bin(buffer[1]);
+    }
+    else
+    {
+        requested_lsldo_mv = bcd2bin(buffer[0]) * 10;
+    }
+
+    LOG_INF("REQUESTED LSLDO VOLTAGE (mV): %d", requested_lsldo_mv);
+    // check ranges
     if (requested_lsldo_mv < 800 || requested_lsldo_mv > 3000)
     {
         // the devicetree will assert this with regulator-min/max-microvolt but check anyway.
@@ -144,7 +156,6 @@ static ssize_t on_receive_lsldo_wr(struct bt_conn *conn, const struct bt_gatt_at
     }
     else
     {
-        LOG_INF("REQUESTED LSLDO VOLTAGE (mV): %d", requested_lsldo_mv);
         k_msgq_put(&ble_cfg_pmic_msgq, &requested_lsldo_mv, K_NO_WAIT);
     }
 
