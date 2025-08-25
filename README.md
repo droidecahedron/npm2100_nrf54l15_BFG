@@ -54,8 +54,9 @@ The nRF54L15 uses two on-chip ADC channels and measures the voltage of the BOOST
 <img width="493" height="153" alt="image" src="https://github.com/user-attachments/assets/311fb2f6-b230-432c-b026-525681e19da5" />
 
 ## BLE Data
-The regulator output voltages and battery percentage have independent characteristics to read over BLE, but for demonstration purposes there is a summary characteristic to read all the values out as a string. (See the [example output](#example-output) section for more information.) Below is a table summary:
+The regulator output voltages and battery percentage have independent characteristics to read over BLE, but for demonstration purposes there is a summary characteristic to read all the values out as a string. (See the [example output](#example-output) section for more information.)
 
+### Table Summary
 Statistic|Permissions|Unit|Individual Characteristic
 ---|---|---|----
 Battery Percentage|Read|%|Yes
@@ -76,7 +77,8 @@ Battery Temp|Read|deg C|No
   - `Port P1 Pin 9` of the **nRF54L15-DK** to the `SDA` pin of the `TWI` header on the **nPM2100-EK**
   - `Port P1 Pin 8` of the **nRF54L15-DK** to the `SCL` pin of the `TWI` header on the **nPM2100-EK**
   - The __middle__ pin of the `VDDM current measure` header on the nRF54L15DK to the `VOUT` pin of the `TWI` header on the **nPM2100-EK**.
-  - and tie the GNDs of the kits together. _Below is a [table summary](#table_of_connections), a [wiring diagram](#wiring-diagram), and a [photo](#image-example) of how it should be wired together._
+  - and tie the GNDs of the kits together.
+    - _Below is a [table summary](#table_of_connections), a [wiring diagram](#wiring-diagram), and a [photo](#image-example) of how it should be wired together._
 
 - Insert your provided battery into its corresponding battery holder, and insert that into the BATTERY INPUT connector on the EK. _This sample is by default configured for the single AA battery board._
 - When everything is connected correctly, switch `SW4` on the **nRF54L15-DK** to `ON`.
