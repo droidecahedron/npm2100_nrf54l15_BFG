@@ -8,7 +8,7 @@ zephyr_include_directories(src/common src/ble src/pmic src/adc) # (inc .)
 # NORDIC SDK APP START
 target_sources(app PRIVATE
 	src/main.c
+	src/adc/npm_adc.c
 	src/ble/ble_periph_pmic.c
 	src/pmic/pmic.c
-	src/adc/npm_adc.c
 )

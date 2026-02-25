@@ -1,0 +1,18 @@
+{
+    "version": 2,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 20
+    },
+    "configurePresets": [
+        {
+            "name": "build",
+            "displayName": "THISISMYPRESET",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/buildWithPreset",
+            "cacheVariables": {
+                "BOARD": "nrf54l15dk/nrf54l15/cpuapp"
+            }
+        }
+    ]
+}

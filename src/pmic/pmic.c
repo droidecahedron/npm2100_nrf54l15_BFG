@@ -11,8 +11,11 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
+
+
 #include <zephyr/device.h>
 #include <zephyr/drivers/mfd/npm2100.h>
+#include <zephyr/drivers/i2c.h>
 #include <zephyr/drivers/regulator.h>
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/drivers/sensor/npm2100_vbat.h>
@@ -29,11 +32,13 @@
 
 LOG_MODULE_REGISTER(pmic, LOG_LEVEL_INF);
 
+static const struct i2c_dt_spec pmic_i2c = I2C_DT_SPEC_GET(DT_NODELABEL(npm2100_pmic));
+static const struct device *pmic_regulators = DEVICE_DT_GET(DT_NODELABEL(npm2100_regulators));
+static const struct device *vbat = DEVICE_DT_GET(DT_NODELABEL(npm2100_vbat));
+
 K_MSGQ_DEFINE(pmic_msgq, sizeof(struct pmic_report_msg), 8, 4);
 K_SEM_DEFINE(sem_pmic_ready, 0, 1);
 
-static const struct device *npm2100_lsldo_regulator = DEVICE_DT_GET(DT_NODELABEL(npm2100ek_ldosw));
-static const struct device *vbat = DEVICE_DT_GET(DT_NODELABEL(npm2100ek_vbat));
 
 static enum battery_type battery_model;
 static bool fuel_gauge_initialized;
@@ -195,15 +200,6 @@ int pmic_fg_thread(void)
 
     fuel_gauge_initialized = false;
 
-    if (!device_is_ready(vbat))
-    {
-        LOG_ERR("vbat device not ready.");
-        return 0;
-    }
-    if (regulator_enable(npm2100_lsldo_regulator))
-    {
-        LOG_ERR("unable to enable regulator!");
-    }
     LOG_INF("PMIC device ok");
     k_sem_give(&sem_pmic_ready);
 
@@ -237,15 +233,17 @@ int pmic_reg_thread(void)
     {
         k_msgq_get(&ble_cfg_pmic_msgq, &requested_lsldo_mv, K_FOREVER); // suspend till msg avail
         requested_lsldo_uv = requested_lsldo_mv * 1000;                 // api wants uV
-        err = regulator_set_voltage(npm2100_lsldo_regulator, requested_lsldo_uv, requested_lsldo_uv);
-        if (err)
-        {
-            LOG_ERR("Failed to set regulator voltage: %d uV, err: %d", requested_lsldo_uv, err);
-        }
-        else
-        {
-            LOG_INF("LSLDO Voltage set to: %d uV", requested_lsldo_uv);
-        }
+        //! For now, not setting the voltage.
+        // err = regulator_set_voltage(pmic_regulators, requested_lsldo_uv, requested_lsldo_uv);
+        // if (err)
+        // {
+        //     LOG_ERR("Failed to set regulator voltage: %d uV, err: %d", requested_lsldo_uv, err);
+        // }
+        // else
+        // {
+        //     LOG_INF("LSLDO Voltage set to: %d uV", requested_lsldo_uv);
+        // }
+        return err+requested_lsldo_uv;
     }
 }
 

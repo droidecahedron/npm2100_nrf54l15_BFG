@@ -24,14 +24,6 @@ K_SEM_DEFINE(sem_gpio_ready, 0, 1);
 int main(void)
 {
     int err;
-    int blink = 0;
-
-    err = dk_leds_init();
-    if (err)
-    {
-        LOG_ERR("LEDs init failed (err %d)", err);
-        return -1;
-    }
 
     k_sem_take(&sem_pmic_ready, K_FOREVER);
     k_sem_give(&sem_gpio_ready);
@@ -39,8 +31,7 @@ int main(void)
 
     for (;;)
     {
-        dk_set_led(DK_STATUS_LED, (++blink) % 2);
         k_sleep(K_MSEC(2000));
     }
-    return 0;
+    return err;
 }

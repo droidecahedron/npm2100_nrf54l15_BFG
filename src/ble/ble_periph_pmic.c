@@ -47,8 +47,8 @@ K_SEM_DEFINE(sem_ble_ready, 0, 1);
 
 #define BT_UUID_PMIC_HUB BT_UUID_DECLARE_128(PMIC_HUB_SERVICE_UUID)
 #define BT_UUID_PMIC_HUB_RD_ALL BT_UUID_DECLARE_128(PMIC_RD_ALL_CHARACTERISTIC_UUID)
-#define BT_UUID_PMIC_HUB_BOOST_RD_MV BT_UUID_DECLARE_128(BOOST_RD_MV_CHARACTERISTIC_UUID)
-#define BT_UUID_PMIC_HUB_LSLDO_RD_MV BT_UUID_DECLARE_128(LSLDO_RD_MV_CHARACTERISTIC_UUID)
+#define BT_UUID_PMIC_HUB_ADCCH0_RD_MV BT_UUID_DECLARE_128(ADCCH0_RD_MV_CHARACTERISTIC_UUID)
+#define BT_UUID_PMIC_HUB_ADCCH1_RD_MV BT_UUID_DECLARE_128(ADCCH1_RD_MV_CHARACTERISTIC_UUID)
 #define BT_UUID_PMIC_HUB_LSLDO_WR_MV BT_UUID_DECLARE_128(LSLDO_WR_MV_CHARACTERISTIC_UUID)
 #define BT_UUID_PMIC_HUB_BATT_RD BT_UUID_DECLARE_128(BATT_RD_CHARACTERISTIC_UUID)
 
@@ -165,18 +165,18 @@ static ssize_t on_receive_lsldo_wr(struct bt_conn *conn, const struct bt_gatt_at
 /*
 primary
 rd all
-rd boost
-rd lsldo
-wr lsldo
+rd adc0
+rd adc1
+wr lsldo !!!DBG deprecate
 rd batt
 */
 BT_GATT_SERVICE_DEFINE(
     pmic_hub, BT_GATT_PRIMARY_SERVICE(BT_UUID_PMIC_HUB),
     BT_GATT_CHARACTERISTIC(BT_UUID_PMIC_HUB_RD_ALL, BT_GATT_CHRC_NOTIFY, BT_GATT_PERM_READ, NULL, NULL, NULL),
     BT_GATT_CCC(on_cccd_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
-    BT_GATT_CHARACTERISTIC(BT_UUID_PMIC_HUB_BOOST_RD_MV, BT_GATT_CHRC_NOTIFY, BT_GATT_PERM_READ, NULL, NULL, NULL),
+    BT_GATT_CHARACTERISTIC(BT_UUID_PMIC_HUB_ADCCH0_RD_MV, BT_GATT_CHRC_NOTIFY, BT_GATT_PERM_READ, NULL, NULL, NULL),
     BT_GATT_CCC(on_cccd_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
-    BT_GATT_CHARACTERISTIC(BT_UUID_PMIC_HUB_LSLDO_RD_MV, BT_GATT_CHRC_NOTIFY, BT_GATT_PERM_READ, NULL, NULL, NULL),
+    BT_GATT_CHARACTERISTIC(BT_UUID_PMIC_HUB_ADCCH1_RD_MV, BT_GATT_CHRC_NOTIFY, BT_GATT_PERM_READ, NULL, NULL, NULL),
     BT_GATT_CCC(on_cccd_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
     BT_GATT_CHARACTERISTIC(BT_UUID_PMIC_HUB_LSLDO_WR_MV, BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
                            BT_GATT_PERM_READ | BT_GATT_PERM_WRITE, NULL, on_receive_lsldo_wr, NULL),
@@ -269,6 +269,7 @@ static void connected(struct bt_conn *conn, uint8_t err)
         return;
     }
     m_connection_handle = bt_conn_ref(conn);
+
     LOG_INF("Connected");
 
     struct bt_conn_info info;
@@ -327,11 +328,11 @@ static void ble_report_pmic_stat(struct bt_conn *conn, const uint8_t *data, uint
     }
 }
 
-static void ble_report_boost_mv(struct bt_conn *conn, const uint32_t *data, uint16_t len)
+static void ble_report_adc0_mv(struct bt_conn *conn, const uint32_t *data, uint16_t len)
 {
     const struct bt_gatt_attr *attr = &pmic_hub.attrs[5];
     struct bt_gatt_notify_params params = {
-        .uuid = BT_UUID_PMIC_HUB_BOOST_RD_MV, .attr = attr, .data = data, .len = len, .func = NULL};
+        .uuid = BT_UUID_PMIC_HUB_ADCCH0_RD_MV, .attr = attr, .data = data, .len = len, .func = NULL};
 
     if (bt_gatt_is_subscribed(conn, attr, BT_GATT_CCC_NOTIFY))
     {
@@ -346,12 +347,12 @@ static void ble_report_boost_mv(struct bt_conn *conn, const uint32_t *data, uint
     }
 }
 
-static void ble_report_lsldo_mv(struct bt_conn *conn, const uint32_t *data, uint16_t len)
+static void ble_report_adc1_mv(struct bt_conn *conn, const uint32_t *data, uint16_t len)
 {
     const struct bt_gatt_attr *attr = &pmic_hub.attrs[8];
 
     struct bt_gatt_notify_params params = {
-        .uuid = BT_UUID_PMIC_HUB_LSLDO_RD_MV, .attr = attr, .data = data, .len = len, .func = NULL};
+        .uuid = BT_UUID_PMIC_HUB_ADCCH1_RD_MV, .attr = attr, .data = data, .len = len, .func = NULL};
 
     if (bt_gatt_is_subscribed(conn, attr, BT_GATT_CCC_NOTIFY))
     {
@@ -427,7 +428,7 @@ void ble_write_thread(void)
         // Wait indefinitely for msg's from other modules
         k_msgq_get(&adc_msgq, &adc_msg, K_FOREVER);
         // msg.channel_mv[0] and msg.channel_mv[1] contain latest ADC results
-        LOG_INF("BLE thread rx from ADC: Ch0(BOOST)=%d mV Ch1(LDOLS)=%d mV", adc_msg.channel_mv[0],
+        LOG_INF("BLE thread rx from ADC: Ch0(P1.04)=%d mV Ch1(P1.05)=%d mV", adc_msg.channel_mv[0],
                 adc_msg.channel_mv[1]);
 
         k_msgq_get(&pmic_msgq, &pmic_msg, K_FOREVER);
@@ -436,14 +437,14 @@ void ble_write_thread(void)
 
         if (m_connection_handle) // if ble connection present
         {
-            ble_report_boost_mv(m_connection_handle, &adc_msg.channel_mv[0], sizeof(adc_msg.channel_mv[0]));
-            ble_report_lsldo_mv(m_connection_handle, &adc_msg.channel_mv[1], sizeof(adc_msg.channel_mv[1]));
+            ble_report_adc0_mv(m_connection_handle, &adc_msg.channel_mv[0], sizeof(adc_msg.channel_mv[0]));
+            ble_report_adc1_mv(m_connection_handle, &adc_msg.channel_mv[1], sizeof(adc_msg.channel_mv[1]));
             uint32_t battcharge = pmic_msg.batt_soc;
             ble_report_batt_soc(m_connection_handle, &battcharge, sizeof(battcharge));
             static uint8_t ble_pmic_stat[MAXLEN]; // string to hold plaintext pmic report
             int len = snprintf(ble_pmic_stat, MAXLEN,
-                               "BATT: %.2f%% , BATTV: %.2fV , TEMP: %.2fC  | LDO: %dmV , BOOST: %dmV", pmic_msg.batt_soc,
-                               pmic_msg.batt_voltage, pmic_msg.temp, adc_msg.channel_mv[1], adc_msg.channel_mv[0]);
+                               "BATT: %.2f%% , BATTV: %.2fV , TEMP: %.2fC  | ADC0: %dmV , ADC1: %dmV", pmic_msg.batt_soc,
+                               pmic_msg.batt_voltage, pmic_msg.temp, adc_msg.channel_mv[0], adc_msg.channel_mv[1]);
             if (!(len >= 0 && len < MAXLEN))
             {
                 LOG_ERR("ble pmic report too large. (%d)", len);

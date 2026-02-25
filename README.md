@@ -14,6 +14,10 @@
 > 
 > _DOOM was ported to the 5340: [DOOM on nRF5340](https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/doom-on-nrf5340)_
 
+# seeed branch
+temporary separate branch for working on a port to the seed board to become a new repo.
+
+` west build -b seeed_nrf54l15_npm2100/nrf54l15/cpuapp -p -- -DBOARD_ROOT="." -DDTC_OVERLAY_FILE="adc_app.overlay"`
 
 # Requirements
 ## Hardware
